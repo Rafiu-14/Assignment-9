@@ -1,9 +1,19 @@
 // src/components/Navbar.jsx
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import { auth } from '../firebaseConfig';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { signOut } from 'firebase/auth';
 
 const Navbar = () => {
-  const [] = useState(); // 
+  const [user] = useAuthState(auth); // Track authentication state
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+    } catch (err) {
+      console.error('Logout error:', err.message);
+    }
+  };
 
   return (
     <nav className="bg-gradient-to-r from-blue-500 to-purple-500 shadow-lg py-4">
@@ -13,7 +23,7 @@ const Navbar = () => {
           Home<span className="text-yellow-400">Haven</span>
         </Link>
 
-        {/* Links */}
+        {/* Navigation Links */}
         <div className="space-x-8 text-white font-semibold">
           <Link to="/" className="hover:text-yellow-400 transition duration-300">
             Home
@@ -23,14 +33,28 @@ const Navbar = () => {
           </Link>
         </div>
 
-        {/* Login/Logout */}
+        {/* Login/Logout Button */}
         <div>
-          <Link
-            to="/login"
-            className="bg-yellow-400 text-blue-800 font-semibold px-5 py-2 rounded-full hover:bg-yellow-300 transition duration-300"
-          >
-            Login
-          </Link>
+          {user ? (
+            <div className="flex items-center space-x-4">
+              <span className="text-white font-medium">
+                {user.displayName || 'User'}
+              </span>
+              <button
+                onClick={handleLogout}
+                className="bg-red-500 text-white font-semibold px-5 py-2 rounded-full hover:bg-red-400 transition duration-300"
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <Link
+              to="/login"
+              className="bg-yellow-400 text-blue-800 font-semibold px-5 py-2 rounded-full hover:bg-yellow-300 transition duration-300"
+            >
+              Login
+            </Link>
+          )}
         </div>
       </div>
     </nav>
